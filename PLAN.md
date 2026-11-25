@@ -204,7 +204,7 @@ Not verified: macOS and Linux, display scaling above 100 %, the real `Game` (log
 - **Enemies:** `attack_power = ATK` and `defense = DEF` (through `gear_bonus`). Enemy CRIT_MULT is 1.5. Neither is stated in the docx.
 - **Log:** one line per action, with crit, dodge, miss, block and "ignores armor" as tags on that line. Status, phase, regen, stun-skip, level-up and win/loss each get their own line.
 - **Items:** 16 rows (7 weapons, 6 armors, 2 accessories, Health Potion). The Table 18 kits alone need 5 weapons and 4 armors, so "about 10" cannot hold.
-- **Rewards:** 3 distinct catalogue items not owned (Health Potion always allowed). The Table 19 tiers are dropped. **Claiming always equips into the item's slot**, and the replaced item goes to the bag. "Only into an empty slot" would make weapon and armor rewards do nothing, because the starter kit fills both slots and there is no other equip screen.
+- **Rewards:** 3 distinct catalogue items not owned (Health Potion always allowed). The Table 19 tiers are dropped. **Claiming equips the item into its slot only if it is an upgrade** (a higher total of ATK + SPELL + DEF), and the replaced item goes to the bag. Otherwise the item stays in the bag, and the card says "Bag only (not an upgrade)". "Only into an empty slot" would make weapon and armor rewards do nothing, because the starter kit fills both slots and there is no other equip screen. "Always equip" let a reward make the hero worse (Cloth Robe over Hide Armor: DEF 3 -> 1).
 - **Knight** Bash while BLOCK is up just refreshes BLOCK (no stack, no refusal).
 - **"need N MP"** shows the shortfall.
 - **Levels:** 25/30/35/80 essence, thresholds 25/55/90, at most one level per `gain_essence` call. F1 Lv1, F2 Lv2, F3 Lv3, F4 Lv4.

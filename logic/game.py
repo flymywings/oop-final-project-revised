@@ -86,26 +86,39 @@ class Game:
         elif self.battle.winner == "enemy":
             self.state = DEFEAT
 
-    def reward_delta(self, item):
-        """Stat change text if item were claimed, e.g. 'ATK 16 -> 23'."""
-        if item.slot is None:
-            return f"+1 {item.name} (have {self.hero.inventory.count(item.name)})"
+    def _equip_effect(self, item):
+        """(is_upgrade, change text) if item replaced the one in its slot.
+
+        Tried on a throwaway copy, so the real hero is untouched. An upgrade is a
+        higher total of ATK + SPELL + DEF (the numbers that decide fights).
+        """
         before = self.hero.snapshot()
-        trial = copy.deepcopy(self.hero)          # a throwaway copy: the real hero is untouched
+        trial = copy.deepcopy(self.hero)
         trial_item = copy.deepcopy(item)
         trial.inventory.add(trial_item)
         trial.equip(trial_item)
         after = trial.snapshot()
         changes = [f"{key} {before[key]} -> {after[key]}"
                    for key in before if before[key] != after[key]]
-        return ", ".join(changes) if changes else "no stat change"
+        score = lambda stats: stats["ATK"] + stats["SPELL"] + stats["DEF"]
+        return score(after) > score(before), ", ".join(changes) or "no stat change"
+
+    def reward_delta(self, item):
+        """Stat change text if item were claimed, e.g. 'ATK 16 -> 23'.
+        A gear item that would not be an upgrade says 'Bag only', because claiming
+        it keeps the item in the bag instead of wearing it."""
+        if item.slot is None:
+            return f"+1 {item.name} (have {self.hero.inventory.count(item.name)})"
+        better, text = self._equip_effect(item)
+        return text if better else f"Bag only (not an upgrade): {text}"
 
     def claim_reward(self, item):
-        """Add item to the bag, equip it if it has a slot, full heal, next floor battle."""
+        """Add item to the bag, equip it if it is an upgrade, full heal, next floor battle."""
         if self.state != REWARD or item not in self.offers:
             raise ValueError("that item is not on offer")
+        better = item.slot is not None and self._equip_effect(item)[0]
         self.hero.inventory.add(item)
-        if item.slot is not None:
+        if better:                    # wear it only if it is an upgrade; otherwise keep it in the bag
             self.hero.equip(item)
         self.hero.full_heal()
         self.floor += 1
