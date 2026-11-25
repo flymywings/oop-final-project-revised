@@ -1,10 +1,3 @@
-"""Items, equipment, the Health Potion, Inventory, starter kits and rewards.
-
-Owner: TJ. CONTRACT SKELETON: keep every name and signature;
-replace each `raise NotImplementedError` with the real body.
-Numbers are docx Table 26 (prices dropped: no shop). Starter kits are Table 18.
-"""
-
 from abc import ABC, abstractmethod
 
 SLOTS = ("weapon", "armor", "accessory")
@@ -45,11 +38,14 @@ class Weapon(Equipment):
 
     def bonuses(self):
         """{'attack': attack, 'focus': focus}."""
-        raise NotImplementedError("TJ")
+        return {"attack": self.attack, "focus": self.focus}
 
     def describe(self):
         """e.g. 'Oak Staff: +3 attack, +14 focus'."""
-        raise NotImplementedError("TJ")
+        text = f"{self.name}: +{self.attack} attack"
+        if self.focus:
+            text += f", +{self.focus} focus"
+        return text
 
 
 class Armor(Equipment):
@@ -65,11 +61,14 @@ class Armor(Equipment):
 
     def bonuses(self):
         """{'defense': defense, 'focus': focus}."""
-        raise NotImplementedError("TJ")
+        return {"defense": self.defense, "focus": self.focus}
 
     def describe(self):
         """e.g. 'Plate Armor: +8 defense'."""
-        raise NotImplementedError("TJ")
+        text = f"{self.name}: +{self.defense} defense"
+        if self.focus:
+            text += f", +{self.focus} focus"
+        return text
 
 
 class Accessory(Equipment):
@@ -85,11 +84,11 @@ class Accessory(Equipment):
 
     def bonuses(self):
         """{stat: amount}."""
-        raise NotImplementedError("TJ")
+        return {self.stat: self.amount}
 
     def describe(self):
         """e.g. 'Lucky Coin: +8 LUCK'."""
-        raise NotImplementedError("TJ")
+        return f"{self.name}: +{self.amount} {self.stat}"
 
 
 class Consumable(Item, ABC):
@@ -110,11 +109,12 @@ class Potion(Consumable):
 
     def apply(self, hero):
         """hero.heal(heal_amount). Returns e.g. 'Knight drinks Health Potion: +35 HP.'"""
-        raise NotImplementedError("TJ")
+        healed = hero.heal(self.heal_amount)
+        return f"{hero.name} drinks {self.name}: +{healed} HP."
 
     def describe(self):
         """'Health Potion: heals 35 HP'."""
-        raise NotImplementedError("TJ")
+        return f"{self.name}: heals {self.heal_amount} HP"
 
 
 class Inventory:
@@ -127,43 +127,63 @@ class Inventory:
 
     def add(self, item):
         """Put an item in the bag (aggregation: the item was made elsewhere)."""
-        raise NotImplementedError("TJ")
+        self.__items.append(item)
 
     def remove(self, item):
         """Take an item out of the bag."""
-        raise NotImplementedError("TJ")
+        self.__items.remove(item)
 
     def items(self):
         """A tuple copy of the bag, never the list itself."""
-        raise NotImplementedError("TJ")
+        return tuple(self.__items)
 
     def count(self, name):
         """How many items with this name are in the bag."""
-        raise NotImplementedError("TJ")
+        return sum(1 for item in self.__items if item.name == name)
 
     def find(self, name):
         """First bag item with this name, or None."""
-        raise NotImplementedError("TJ")
+        for item in self.__items:
+            if item.name == name:
+                return item
+        return None
 
     def equipped(self, slot):
         """The item in slot, or None."""
-        raise NotImplementedError("TJ")
+        return self.__slots[slot]
 
     def equip(self, item):
         """Bag -> slot. The old item (if any) goes back to the bag and is returned."""
-        raise NotImplementedError("TJ")
+        if item not in self.__items:
+            raise ValueError("item is not in the bag")
+        if item.slot not in self.__slots:
+            raise ValueError("item cannot be equipped")
+        self.__items.remove(item)
+        old = self.__slots[item.slot]
+        self.__slots[item.slot] = item
+        if old is not None:
+            self.__items.append(old)
+        return old
 
     def unequip(self, slot):
         """Slot -> bag. Returns the item, or None if the slot was empty."""
-        raise NotImplementedError("TJ")
+        item = self.__slots[slot]
+        if item is None:
+            return None
+        self.__slots[slot] = None
+        self.__items.append(item)
+        return item
 
     def gear_bonus(self, key):
         """Sum of bonuses()[key] over the equipped items."""
-        raise NotImplementedError("TJ")
+        return sum(item.bonuses().get(key, 0)
+                   for item in self.__slots.values() if item is not None)
 
     def owned_names(self):
         """Set of names in the bag and in the slots."""
-        raise NotImplementedError("TJ")
+        names = {item.name for item in self.__items}
+        names.update(item.name for item in self.__slots.values() if item is not None)
+        return names
 
 
 # ---------- catalogue: one row per item, built fresh by make_item() ----------
@@ -202,14 +222,26 @@ STARTER_KITS = {
 
 def make_item(name):
     """A NEW Item object for this catalogue name."""
-    raise NotImplementedError("TJ")
+    kind, first, second = CATALOGUE[name]
+    if kind == "weapon":
+        return Weapon(name, first, second)
+    if kind == "armor":
+        return Armor(name, first, second)
+    if kind == "accessory":
+        return Accessory(name, first, second)
+    if kind == "potion":
+        return Potion(name, first)
+    raise ValueError(f"unknown item kind: {kind}")
 
 
 def starter_kit(class_name):
     """New Item objects for this class's starter kit."""
-    raise NotImplementedError("TJ")
+    return [make_item(name) for name in STARTER_KITS[class_name]]
 
 
 def reward_choices(owned_names, rng, count=3):
     """count NEW items, distinct, none already owned (Health Potion is always allowed)."""
-    raise NotImplementedError("TJ")
+    pool = [name for name in CATALOGUE
+            if name == "Health Potion" or name not in owned_names]
+    chosen = rng.sample(pool, min(count, len(pool)))
+    return [make_item(name) for name in chosen]
