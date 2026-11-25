@@ -23,7 +23,7 @@ No git? [Download the ZIP](https://github.com/flymywings/oop-final-project-revis
 |---|---|
 | `python main.py` | Plays the real game: the Tkinter menu, then the Pygame battle. |
 | `python main.py stub` | Same screens on fake data (`logic/stub.py`), for testing the UI alone. |
-| `python -m pytest -q` | Runs the tests. They need neither toolkit nor a display. |
+| `python -m pytest -q` | Runs the tests. First `python -m pip install -r requirements-dev.txt`. No display or sound card is needed: the GUI and sound tests use Pygame's silent "dummy" drivers. |
 
 `models/` and `logic/` must never mention either toolkit: `grep -rE "tkinter|pygame" models/ logic/` prints nothing.
 
@@ -34,6 +34,7 @@ No git? [Download the ZIP](https://github.com/flymywings/oop-final-project-revis
 3. Win a fight and you level up, then pick **1 of 3 reward items**. Only upgrades are offered, and the item you pick is worn at once. You heal to full before the next floor.
 4. Beat all 4 floors (Goblin, Orc, Ogre Warlord, Elder Dragon) to win. If your HP reaches 0, the run is over.
 5. On the Victory or Defeat screen, **Restart** closes the battle window and opens a fresh menu. Closing either window with its X quits the game.
+6. **Sound:** hits, dodges, misses, blocks, potions, clicks and the win and lose screens each have a sound. The `-`, `+` and `Sound` buttons at the top right of the menu and the battle screen change the volume or mute. With no sound card, or no files in `sounds/`, the game just plays silently.
 
 ## The 5 classes
 
@@ -71,11 +72,11 @@ Only one window is open at a time, and both use the same `Game` object. `main.py
 |---|---|
 | Daniel | `models/heroes.py`, `models/enemies.py` |
 | TJ | `models/items.py` (items, inventory, 20 catalogue items) |
-| Khael | `ui/theme.py`, `ui/battle.py`, `assets/` sprites |
+| Khael | `ui/theme.py`, `ui/battle.py`, `assets/` sprites and background |
 | Joseph | `ui/menu.py`, `ui/reward.py`, `ui/end.py`, `README.md` |
-| Lead | `models/character.py`, `logic/battle.py`, `logic/game.py`, `logic/stub.py`, `main.py`, `tests/` |
+| Lead | `models/character.py`, `logic/battle.py`, `logic/game.py`, `logic/stub.py`, `main.py`, `tests/`, sound (`ui/sound.py`, `sounds/`, `tools/process_sounds.py`; the battle screen calls it), `requirements*.txt` |
 
-[PLAN.md](PLAN.md) holds the full plan, the requirement trace and the contracts.
+[PLAN.md](PLAN.md) holds the full plan, the requirement trace and the contracts. [STUDY_GUIDE.md](STUDY_GUIDE.md) explains every concept in plain words, with code references and demos, for the presentation.
 
 ## OOP concepts by week (where each is in the code)
 
