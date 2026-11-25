@@ -223,7 +223,7 @@ Full code is in the file. Tests in tests/test_character.py are green now.
 | 0:00-1:30 | Lead | Toolkit split confirmed (A, resolved item 6). Two-toolkit skeleton pushed (done): the B.1 router in main.py; working pg_font, PgButton and load_surface in ui/theme.py; plain working screens in ui/menu.py (Tkinter) and ui/battle.py, ui/reward.py, ui/end.py (Pygame); the defeat fix in logic/stub.py. The acceptance check (B.1) passes on them. Everyone pulls, runs `python -m pip install pygame pytest`, then `python main.py stub` and `python -m pytest -q` (17 green, 15 red until owners fill their files). |
 | 1:30-2:00 | Khael | Final ui/theme.py pushed by **2:00**: both the Tk half and the Pygame half, names unchanged. |
 | 1:30-3:30 | Daniel, TJ | heroes/enemies and items. TJ first: Inventory + make_item + starter_kit by 2:30, because Daniel's tests need them. |
-| 1:30-3:30 | Lead | logic/battle.py and logic/game.py. Run test_game.py as soon as Daniel and TJ push. |
+| 1:30-3:30 | Lead | logic/battle.py and logic/game.py (done: all 32 tests passed against a throwaway reference fill of the models, and 10,000 bot runs had no crash). Run test_game.py as soon as Daniel and TJ push. |
 | 2:00-5:00 | Joseph | Menu (Tkinter) first, then reward and end (Pygame), all on the stub. Then the README. |
 | 1:30-5:00 | Khael | Battle screen (Pygame) on the stub, then sprites. A missing PNG gets a coloured placeholder box in both toolkits. |
 | ~3:30 | Lead | **First playable fight** (one class beats the Goblin): start playtesting and file bugs to the file owner. |
