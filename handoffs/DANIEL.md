@@ -20,7 +20,7 @@ Everything else belongs to someone else. If you think another file is wrong, tel
 
 ## Step 0: Set up (10 min)
 1. Get the project folder, **either** way:
-   - **With git:** `git clone <REPO-URL>` (the Lead sends you the link), then `cd` into the folder.
+   - **With git:** Accept the Lead's GitHub invitation, run `git clone https://github.com/flymywings/oop-final-project-revised.git`, then `cd` into the folder.
    - **Without git:** ask the Lead for the zip, unzip it, and open a terminal in that folder.
 2. Check Python: `python --version` must say 3.12.
 3. Install the test tool: `pip install pytest`
