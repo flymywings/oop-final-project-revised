@@ -38,23 +38,38 @@ class Hero(Character, ABC):
 
     def potion_count(self):
         """How many Health Potions are in the bag."""
-        raise NotImplementedError("Daniel")
+        return self.inventory.count("Health Potion")
 
     def use_potion(self):
         """Drink one Health Potion (Potion.apply) and remove it. Returns a log line."""
-        raise NotImplementedError("Daniel")
+        potion = self.inventory.find("Health Potion")
+        if potion is None:
+            return f"{self.name} has no Health Potion left."
+        self.inventory.remove(potion)
+        return potion.apply(self)
 
     def gain_essence(self, amount):
         """Add essence; level up at most once if a threshold is crossed. Returns log lines."""
-        raise NotImplementedError("Daniel")
+        self.essence += int(amount)
+        crossed = 0
+        for threshold in self.LEVEL_THRESHOLDS:
+            if self.essence >= threshold:
+                crossed += 1
+        lines = []
+        # At most one level per call, even if 200 essence arrives at once.
+        if crossed + 1 > self.level:
+            lines.append(self.level_up())
+        return lines
 
     def level_up(self):
         """level += 1 and self.grow(self.GROWTH). Returns a log line."""
-        raise NotImplementedError("Daniel")
+        self.level += 1
+        self.grow(self.GROWTH)
+        return f"LEVEL UP! {self.name} is now Lv{self.level}."
 
     def describe(self):
         """e.g. 'Knight Lv2 - Shield Bash (10 MP)'."""
-        raise NotImplementedError("Daniel")
+        return f"{self.name} Lv{self.level} - {self.SPECIAL_NAME} ({self.MANA_COST} MP)"
 
 
 class Knight(Hero):
@@ -72,7 +87,9 @@ class Knight(Hero):
 
     def special_attack(self, target, rng):
         """_roll_damage(0.8x attack_power), then add_status(BLOCK). Returns a log line."""
-        raise NotImplementedError("Daniel")
+        line = self._roll_damage(target, self.attack_power * 0.8, rng, "Shield Bash")
+        self.add_status(BLOCK)
+        return f"{line} {self.name} braces for the next hit (BLOCK)."
 
 
 class Thief(Hero):
@@ -90,7 +107,8 @@ class Thief(Hero):
 
     def special_attack(self, target, rng):
         """_roll_damage(1.5x attack_power, force_crit=True). Returns a log line."""
-        raise NotImplementedError("Daniel")
+        return self._roll_damage(target, self.attack_power * 1.5, rng,
+                                 "Backstab", force_crit=True)
 
 
 class Jester(Hero):
@@ -110,7 +128,22 @@ class Jester(Hero):
         """0.5x spell_power (ignore_armor), then roll = rng.randint(1, 6) + LUCK//5:
         <=4 CRIT UP on self; 5-6 STUN target 1 turn; 7-8 heal 20 % max HP;
         >=9 extra 1.5x spell_power hit. Returns one log line."""
-        raise NotImplementedError("Daniel")
+        lines = [self._roll_damage(target, self.spell_power * 0.5, rng,
+                                   "Trick", ignore_armor=True)]
+        roll = rng.randint(1, 6) + self.stat("LUCK") // 5
+        if roll <= 4:
+            self.add_status(CRIT_UP)
+            lines.append(f"{self.name} feels lucky (CRIT UP).")
+        elif roll <= 6:
+            target.add_status(STUN, 1)
+            lines.append(f"{target.name} is stunned!")
+        elif roll <= 8:
+            healed = self.heal(self.max_hp * 0.2)
+            lines.append(f"{self.name} heals {healed} HP.")
+        else:
+            lines.append(self._roll_damage(target, self.spell_power * 1.5, rng,
+                                           "Wild Card", ignore_armor=True))
+        return " ".join(lines)
 
 
 class Sorcerer(Hero):
@@ -128,7 +161,8 @@ class Sorcerer(Hero):
 
     def special_attack(self, target, rng):
         """_roll_damage(1.0x spell_power, ignore_armor=True). Returns a log line."""
-        raise NotImplementedError("Daniel")
+        return self._roll_damage(target, self.spell_power * 1.0, rng,
+                                 "Fireball", ignore_armor=True)
 
 
 class Druid(Hero):
@@ -147,7 +181,11 @@ class Druid(Hero):
     def special_attack(self, target, rng):
         """heal(25 % max_hp), add_status(REGEN, 3), then 0.5x spell_power
         (ignore_armor). Returns one log line."""
-        raise NotImplementedError("Daniel")
+        healed = self.heal(self.max_hp * 0.25)
+        self.add_status(REGEN, 3)
+        line = self._roll_damage(target, self.spell_power * 0.5, rng,
+                                 "Rejuvenate", ignore_armor=True)
+        return f"{self.name} heals {healed} HP and sets REGEN. {line}"
 
 
 # Class-select order. Game builds heroes only through this dict.
