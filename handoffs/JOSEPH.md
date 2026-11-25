@@ -32,7 +32,8 @@ Build the 3 simple screens around the battle (pick a hero in Tkinter; pick a rew
 
 "Stub" means fake: fake numbers, but the same names as the real game. You can build all 3 screens today without waiting for anyone. When the real game is ready, `python main.py` just works.
 
-**Before 1:30** the Lead pushes a new skeleton in which `ui/reward.py` and `ui/end.py` are Pygame placeholder screens. Pull it (or get the Lead's fresh zip) before you start them. If they still say `(tk.Frame)`, you have the old ones. `ui/menu.py` stays Tkinter, so you can start it at once.
+The skeleton is already two-toolkit. `ui/menu.py` (Tkinter) and `ui/reward.py`, `ui/end.py` (Pygame) are plain placeholders that already work by mouse. You make them look good and finish them. The menu already puts a hero picture on each class button as soon as Khael's PNGs exist.
+If `ui/reward.py` or `ui/end.py` still says `(tk.Frame)`, you have an old copy: pull again (or ask the Lead for a fresh zip).
 
 ## Step 1: Understand the 4 ideas you need (10 min)
 
@@ -89,7 +90,7 @@ The stats text, the "ATK 16 -> 23" text and so on all come from the game. You ju
 2. The floor reached (`self.app.game.floor`) and `self.app.game.hero.describe()`.
 3. A **Restart** `PgButton`. A click on it runs `self.app.game.restart()`, then `self.app.show()`. That closes the Pygame window and opens a fresh menu, with nothing selected.
 
-**Tip:** the current stub can never lose, so Defeat never shows. The Lead's 1:30 stub fixes this: then clicking only Light (or only the enemy picture) loses on floor 4, and clicking only Heavy wins.
+**Tip:** to see Defeat in the stub, click only Light (or only the enemy picture): you lose on floor 4. Click only Heavy to see Victory.
 
 ## Step 3: README.md (last part of the day)
 Follow section G in `PLAN.md`. Open with the **game concept** paragraph, because it replaces the lab's Marvel vs DC. Say there that the menu is Tkinter and the fights are Pygame. Then:

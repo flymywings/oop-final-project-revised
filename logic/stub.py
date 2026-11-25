@@ -121,7 +121,10 @@ class StubBattle:
         if self.over or self.turn != "enemy":
             return
         h, e = self.hero, self.enemy
-        damage = 7 if h.statuses.pop("BLOCK", None) else 14
+        # 9, 13, 17, 21 by floor: on floor 4 Light-only loses and Heavy-only wins,
+        # so the UI team can reach both the victory and the defeat screens.
+        hit = 5 + 4 * self.floor
+        damage = hit // 2 if h.statuses.pop("BLOCK", None) else hit
         h.hp = max(0, h.hp - damage)
         self.log.append(f"{e.name}'s attack hits {h.name} for {damage}.")
         if h.hp <= 0:

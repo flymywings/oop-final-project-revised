@@ -11,8 +11,9 @@ GUI check: `grep -rE "tkinter|pygame" models/ logic/` must print nothing.
 
 **Two toolkits, one game.** Tkinter shows the title and class-selection screen. Pygame shows battle, rewards, victory and defeat.
 One `Game` object is shared by both windows, and only one window is open at a time. [Section B.1](#b1-window-routing) is the routing contract.
-**Skeleton status:** `main.py`, `ui/theme.py`, `ui/battle.py`, `ui/reward.py`, `ui/end.py` and `logic/stub.py` still contain the earlier all-Tkinter skeleton.
-The Lead re-pushes them to match section B before 1:30 (see D). Until then, section B wins over those six files. Every other file already matches.
+**Skeleton status: matches section B.** `main.py` has the B.1 router, and `ui/theme.py` has both halves.
+`ui/menu.py` (Tkinter) and `ui/battle.py`, `ui/reward.py`, `ui/end.py` (Pygame) are plain working placeholders that already pass the acceptance check. Their owners restyle and finish them.
+`logic/stub.py` can reach both Victory and Defeat.
 
 ---
 
@@ -54,10 +55,9 @@ Screens: **Menu** is Tkinter. **Battle**, **Reward** and **End** (victory or def
 3. **Turn indicator (lab Part 6).** The player always goes first, with no initiative roll. Khael's card adds one label ("Round 3 - your turn" / "Enemy turn...").
 4. **Heal button.** The Table 18 starter kits have no potion, so the Potion button would be dead in the F1 demo. Every starter kit gets 1 Health Potion (models/items.py STARTER_KITS).
 5. **Ex 1 "clicking highlights the selected hero".** The menu click selects and highlights, then a Start button begins the run. A click that starts the run at once would skip the highlight.
-6. **Toolkit split: an ASSUMPTION.** No newer final-project instructions were available. The sources checked were the Week 5 lab PDF, the Week 1, 3 and 4 lab PDFs, and our own Complete.docx.
-   The Week 5 lab says "We will continue using Tkinter", and every lab example is Tkinter. We assume the team may choose its toolkits, as it chose its own theme (resolved item 2).
+6. **Toolkit split: confirmed by the Lead (25 November 2026).** Tkinter is used for the menu and Pygame for the fights.
+   The Week 5 lab says "We will continue using Tkinter", and every lab example is Tkinter, so this was checked before building on it.
    Tkinter still carries the lab's Tkinter-specific items: `PhotoImage` hero images on buttons (row 11), and hover via `<Enter>`/`<Leave>` bindings (row 7) on the menu.
-   **The Lead confirms this with the professor before 1:30.** If the answer is "Tkinter only", go back to the all-Tkinter plan in git history (commit `8ac63af`, PLAN.md and handoffs/). Do not mix the two plans.
 
 ---
 
@@ -164,11 +164,10 @@ Nothing else crosses between the toolkits: no globals, no files, no command-line
 **How `StubGame` exercises the same flow.** `python main.py stub` runs this same `main()` with `StubGame` in place of `Game`.
 StubGame has the same `state` values and the same `class_preview`, `new_run`, `player_action`, `enemy_turn`, `claim_reward` and `restart` calls, so every row of the control table runs unchanged.
 The stub path is menu → Start → battle F1 → reward → F2 → reward → F3 → reward → F4 → victory or defeat → Restart → menu.
-**Gap, found by an exhaustive search of all 3,841 stub click states:** the current stub can never reach Defeat. Its enemy hits for 14, which is too weak.
-**Lead fix before 1:30, in `StubBattle.enemy_turn`:** use `hit = 5 + 4 * self.floor` (BLOCK halves it) in place of the fixed 14.
-With that change, Heavy-only wins on floor 4 and Light-only (or portrait-only) loses on floor 4. Both results were measured in the prototype.
+**Stub defeat fix (done):** the old stub enemy hit for a fixed 14, and an exhaustive search of all 3,841 stub click states showed Defeat could never be reached.
+`StubBattle.enemy_turn` now hits for `5 + 4 * self.floor` (BLOCK halves it). Both end states are reachable (4,524 states searched): Heavy-only wins on floor 4, and Light-only (or portrait-only) loses there.
 
-**Acceptance check** (3 minutes, any teammate, `python main.py stub`; needs the stub fix):
+**Acceptance check** (3 minutes, any teammate, `python main.py stub`):
 1. The menu (Tk) opens and Start is grey. Click Knight: it highlights and shows stats. Click Start.
 2. The menu closes and the battle window (Pygame) opens in front. Only one game window shows in the taskbar.
 3. Click Heavy until Victory; on each reward screen, click any card. Then click Restart.
@@ -190,7 +189,14 @@ Real OS mouse clicks drove it on the desktop, in 5 launches:
 
 The window list was sampled every 20 ms. Result: **53/53 checks passed** with the `focus_force` line, and 50/53 without it (the 3 failures were the inactive menu after Restart).
 Each launch exited with code 0, wrote nothing to stderr and left no window open. There was never more than one window, and each Start made a new hero.
-Not verified: macOS and Linux, display scaling above 100 %, the real `Game` (logic not written yet), real sprites, and hover colours (not checked).
+**Skeleton QA (same day, same machine).** The pushed `main.py` and placeholder screens were run as `python main.py stub` through the same 5 real-mouse launches.
+Only a logging wrapper outside the repo was added. Result: **58/58 checks passed**:
+- each launch exited with code 0, with nothing on stdout or stderr;
+- there was never more than one window, and each window opened in front;
+- each Start made a new hero, and Victory and Defeat were both reached.
+
+Screenshots confirmed the hover colour on a Pygame button and on a Tk menu button. `python -m pytest -q` is unchanged (17 pass, 15 fail), and both greps print nothing.
+Not verified: macOS and Linux, display scaling above 100 %, the real `Game` (logic not written yet; `python main.py` opens the menu, and picking a class raises `NotImplementedError` until the Lead fills logic/game.py), and real sprites.
 
 ### Rules fixed by the contract (decisions where the docx or brief was silent or in conflict)
 - **Damage pipeline** (`Character._roll_damage`, the only place damage is computed): raw × damage_bonus → crit (CRIT UP or force_crit or roll; × CRIT_MULT) → dodge (0 damage) → `max(1, int(raw) - defense)`, where spells and boss slam/breath skip the subtraction but keep the minimum of 1 → BLOCK `max(1, int(d × 0.5))` → apply.
@@ -214,7 +220,7 @@ Full code is in the file. Tests in tests/test_character.py are green now.
 
 | Time | Who | What |
 |---|---|---|
-| 0:00-1:30 | Lead | Confirm the toolkit split with the professor (A, resolved item 6). Re-push the six skeleton files listed at the top: the B.1 router in main.py; working stubs of pg_font, PgButton and load_surface in ui/theme.py; Pygame placeholder screens in ui/battle.py, ui/reward.py and ui/end.py; the defeat fix in logic/stub.py. Pass the acceptance check (B.1) on the placeholders. Everyone pulls, runs `python -m pip install pygame pytest`, then `python main.py stub` and `python -m pytest -q` (17 green, 15 red until owners fill their files). |
+| 0:00-1:30 | Lead | Toolkit split confirmed (A, resolved item 6). Two-toolkit skeleton pushed (done): the B.1 router in main.py; working pg_font, PgButton and load_surface in ui/theme.py; plain working screens in ui/menu.py (Tkinter) and ui/battle.py, ui/reward.py, ui/end.py (Pygame); the defeat fix in logic/stub.py. The acceptance check (B.1) passes on them. Everyone pulls, runs `python -m pip install pygame pytest`, then `python main.py stub` and `python -m pytest -q` (17 green, 15 red until owners fill their files). |
 | 1:30-2:00 | Khael | Final ui/theme.py pushed by **2:00**: both the Tk half and the Pygame half, names unchanged. |
 | 1:30-3:30 | Daniel, TJ | heroes/enemies and items. TJ first: Inventory + make_item + starter_kit by 2:30, because Daniel's tests need them. |
 | 1:30-3:30 | Lead | logic/battle.py and logic/game.py. Run test_game.py as soon as Daniel and TJ push. |
@@ -245,10 +251,10 @@ With those values, run win is Knight 18 %, Thief 30 %, Jester 64 %, Sorcerer 30 
 ### Lead: models/character.py (done), logic/battle.py, logic/game.py, main.py, QA
 - **Done when:** tests/test_game.py is green, `python main.py` plays all 4 floors, and each class has had one full run.
   The acceptance check (B.1) passes on `python main.py stub` and on `python main.py`.
-- **Window routing (main.py, by 1:30):** build `main()`, `TkApp` and `PygameApp` exactly as in B.1, with the `focus_force` line and the per-frame click rule. Neither app ever computes game numbers.
+- **Window routing (main.py, done):** `main()`, `TkApp` and `PygameApp` follow B.1, with the `focus_force` line and the per-frame click rule. Neither app ever computes game numbers.
   If a screen calls `app.show()` and the state belongs to the other toolkit, that app closes its own window; the router opens the next one.
-  Closing either window ends the program. Restart reopens the menu.
-- **Skeleton re-push (by 1:30):** the five other files listed at the top of this plan, as placeholders that already pass the acceptance check. Owners take them over at 1:30.
+  Closing either window ends the program. Restart reopens the menu. Keep this file stable: a router change touches every screen.
+- **Skeleton (done):** theme, the four placeholder screens and the stub fix are pushed and pass the acceptance check. Owners take their files over at 1:30.
 - **Waits on:** Daniel (heroes, enemies) and TJ (items) for real runs. The stub covers the UI until then.
 - **QA:** file each bug to the owner of the file it lives in, with the battle log lines. A window bug (two windows, a lost menu, a hang on close) is the Lead's.
 
@@ -305,7 +311,7 @@ Then run python -m pytest -q tests/test_models.py and show me the output.
 ### Khael: ui/theme.py, ui/battle.py, assets/
 - **Done when:** with `python main.py stub` and then `python main.py`, a full fight is playable in the Pygame window by mouse only. That means hover on every clickable, HP/mana bars, status chips from `statuses`, Light/Heavy/Special/Potion buttons, a disabled Special showing `special_label()`, enemy portrait click = Light, a log panel, a turn label and sprites. Nine 200x200 PNGs are in assets/.
   The theme serves both toolkits: Joseph's Tk menu and his Pygame reward and end screens use it unchanged.
-- **Waits on:** nothing (stub, plus the Lead's 1:30 skeleton). theme.py final by **2:00**.
+- **Waits on:** nothing (the stub and the two-toolkit skeleton are in). theme.py final by **2:00**.
 - **Prompt:**
 ```
 You are helping a sophomore build the Pygame battle screen and the shared theme for a graded
@@ -436,5 +442,4 @@ The tests import neither toolkit, so they need only `pytest`, not `pygame` or a 
 - **Docx numbers** were read from the text extraction of Complete.docx Tables 18, 22, 23, 25 and 26. They match Table 24 (Knight 158 HP/27 MP/16 ATK, Sorcerer 101/130/54 spell, Druid 115 HP) and Goblin dodge 15.2 % / crit 15.8 %. The figures (images) were not read.
 - **macOS:** tk.Button ignores `bg`, so hover colours do not show on the Tk menu on a Mac. If anyone demos on a Mac, HoverButton must become a Label with a click binding.
   The Tk → Pygame → Tk handoff in one process was tested only on Windows 10. Tk and SDL both drive the macOS app event loop, so **demo on Windows** unless the acceptance check (B.1) passes on that Mac.
-- **Toolkit split approved?** It is an assumption (A, resolved item 6) until the professor confirms it.
 - **Display scaling above 100 %:** the prototype ran at 96 DPI only. If the menu and the battle window come out at different sizes on a scaled laptop, the Lead makes main.py DPI-aware at start-up (Windows only), before the first window opens.

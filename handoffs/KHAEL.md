@@ -29,7 +29,8 @@ You decide how the game looks in both toolkits, and you build the Pygame battle 
 
 "Stub" means fake: fake numbers, fake enemies, but the same buttons and names as the real game. You can build the whole screen today without waiting for anyone. When the real game is ready, `python main.py` just works.
 
-**Before 1:30** the Lead pushes a new skeleton in which `ui/battle.py` is a Pygame placeholder screen and `ui/theme.py` already has plain working versions of the Pygame names. Pull it (or get the Lead's fresh zip) before you start. If your `ui/battle.py` still says `class BattleScreen(tk.Frame)`, you have the old one.
+The skeleton is already two-toolkit. `ui/battle.py` is a plain Pygame placeholder that plays a whole fight, and `ui/theme.py` has plain working versions of the Pygame names. You make them look good and add what's missing (sprites, bars, chips, portrait hover).
+If your `ui/battle.py` still says `class BattleScreen(tk.Frame)`, you have an old copy: pull again (or ask the Lead for a fresh zip).
 
 ## Step 1: Understand the 4 ideas you need (10 min)
 

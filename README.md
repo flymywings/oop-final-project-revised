@@ -24,9 +24,8 @@ Only one window is open at a time, and both windows use the same game object.
 
 The exact contract and a 3-minute acceptance check are in [PLAN.md, section B.1](PLAN.md#b1-window-routing).
 
-**Assumption:** the Week 5 lab uses Tkinter, and no newer final-project instructions were available. We assume the team may choose its toolkits. The Lead is confirming this with the professor ([PLAN.md, section A, resolved item 6](PLAN.md#requirements-this-brief-misses-resolved)).
-
-**Skeleton status:** `main.py`, `ui/theme.py`, `ui/battle.py`, `ui/reward.py`, `ui/end.py` and `logic/stub.py` still contain the earlier all-Tkinter skeleton. The Lead re-pushes them to match this plan before 1:30. Until then, `python main.py stub` shows the old Tkinter-only placeholders.
+The toolkit split is confirmed ([PLAN.md, section A, resolved item 6](PLAN.md#requirements-this-brief-misses-resolved)).
+The screens in `ui/` are plain working placeholders: the whole flow already runs by mouse on the stub. Each owner restyles and finishes their own screens.
 
 ## Start by reading your handoff
 
@@ -63,7 +62,7 @@ python main.py stub
 | Command | What it does today |
 |---|---|
 | `python -m pytest -q` | Runs the tests. In the starter code, 17 pass and 15 fail where methods are still stubs. The tests need neither toolkit nor a display. |
-| `python main.py stub` | **Preview with fake data** (`logic/stub.py`). Build and test the screens with it. It needs no models. After the Lead's 1:30 skeleton it opens the Tkinter menu, then the Pygame battle. |
+| `python main.py stub` | **Preview with fake data** (`logic/stub.py`). Build and test the screens with it. It needs no models. It opens the Tkinter menu, then the Pygame battle. |
 | `python main.py` | Launches the game entry point. A full run requires the remaining game logic and screens. |
 
 `models/` and `logic/` must never mention either toolkit: `grep -rE "tkinter|pygame" models/ logic/` prints nothing.
