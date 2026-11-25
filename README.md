@@ -76,7 +76,7 @@ Only one window is open at a time, and both use the same `Game` object. `main.py
 | Joseph | `ui/menu.py`, `ui/reward.py`, `ui/end.py`, `README.md` |
 | Lead | `models/character.py`, `logic/battle.py`, `logic/game.py`, `logic/stub.py`, `main.py`, `tests/`, sound (`ui/sound.py`, `sounds/`, `tools/process_sounds.py`; the battle screen calls it), `requirements*.txt` |
 
-[PLAN.md](PLAN.md) holds the full plan, the requirement trace and the contracts. [STUDY_GUIDE.md](STUDY_GUIDE.md) explains every concept in plain words, with code references and demos, for the presentation.
+[PLAN.md](PLAN.md) holds the full plan, the requirement trace and the contracts. [STUDY_GUIDE.md](STUDY_GUIDE.md) explains every concept in plain words, with code references and demos, for the presentation. The class diagram is [docs/class_diagram.png](docs/class_diagram.png).
 
 ## OOP concepts by week (where each is in the code)
 

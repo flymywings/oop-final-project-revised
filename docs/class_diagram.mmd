@@ -1,0 +1,284 @@
+classDiagram
+  class Accessory {
+    amount
+    slot : str
+    stat
+    bonuses()
+    describe()
+  }
+  class Armor {
+    defense
+    focus : int
+    slot : str
+    bonuses()
+    describe()
+  }
+  class Battle {
+    enemy
+    floor
+    hero
+    log : list
+    over
+    rng
+    round : int
+    turn : str
+    winner : NoneType, str
+    can_potion()
+    can_special()
+    enemy_turn()
+    player_action(action)
+    special_label()
+  }
+  class BossEnemy {
+    PHASE_AT : float
+    PHASE_BONUS : float
+    PHASE_TEXT : str
+    SPECIAL_SCALE : float
+    phase : int
+    check_phase()
+    damage_bonus()
+    special_attack(target, rng)
+  }
+  class Character {
+    BASE_HP : int
+    BASE_MANA : int
+    CRIT_MULT : float
+    HP_PCT : float
+    MANA_COST : int
+    MANA_PCT : float
+    SPECIAL_NAME : str
+    STATS : dict
+    attack_power
+    crit
+    defense
+    dodge
+    hp
+    is_alive
+    mana
+    max_hp
+    max_mana
+    name
+    spell_power
+    sprite_name
+    statuses
+    add_status(name, turns)
+    can_special()
+    consume_status(name)
+    damage_bonus()
+    describe()*
+    end_turn()
+    full_heal()
+    gear_bonus(key)
+    grow(growth)
+    has_status(name)
+    heal(amount)
+    heavy_attack(target, rng)
+    light_attack(target, rng)
+    snapshot()
+    special_attack(target, rng)*
+    stat(name)
+    use_special(target, rng)
+  }
+  class Consumable {
+    apply(hero)*
+  }
+  class Druid {
+    BASE_HP : int
+    BASE_MANA : int
+    CRIT_MULT : float
+    GROWTH : dict
+    HP_PCT : float
+    MANA_COST : int
+    MANA_PCT : float
+    SPECIAL_NAME : str
+    STATS : dict
+    special_attack(target, rng)
+  }
+  class ElderDragon {
+    ATK : int
+    BASE_HP : int
+    DEF : int
+    ESSENCE : int
+    PHASE_AT : float
+    PHASE_BONUS : float
+    PHASE_TEXT : str
+    SPECIAL_NAME : str
+    STATS : dict
+    turns_taken
+    choose_action()
+  }
+  class Enemy {
+    ATK : int
+    BASE_MANA : int
+    DEF : int
+    ESSENCE : int
+    HP_PCT : float
+    turns_taken : int
+    basic_attack(target, rng)
+    check_phase()
+    choose_action()*
+    describe()
+    gear_bonus(key)
+    special_attack(target, rng)
+  }
+  class Equipment {
+    bonuses()*
+  }
+  class Game {
+    CLASS_NAMES : list
+    battle : NoneType
+    floor : int
+    hero : NoneType
+    offers : list
+    rng : Random
+    state : str
+    claim_reward(item)
+    class_preview(class_name)
+    enemy_turn()
+    new_run(class_name)
+    player_action(action)
+    restart()
+    reward_delta(item)
+  }
+  class Goblin {
+    ATK : int
+    BASE_HP : int
+    DEF : int
+    ESSENCE : int
+    STATS : dict
+    choose_action()
+  }
+  class Hero {
+    GROWTH : dict
+    LEVEL_THRESHOLDS : tuple
+    essence : int
+    inventory
+    level : int
+    describe()
+    equip(item)
+    gain_essence(amount)
+    gear_bonus(key)
+    level_up()
+    potion_count()
+    unequip(slot)
+    use_potion()
+  }
+  class Inventory {
+    add(item)
+    count(name)
+    equip(item)
+    equipped(slot)
+    find(name)
+    gear_bonus(key)
+    items()
+    owned_names()
+    remove(item)
+    unequip(slot)
+  }
+  class Item {
+    name
+    slot : NoneType
+    describe()*
+  }
+  class Jester {
+    BASE_HP : int
+    BASE_MANA : int
+    CRIT_MULT : float
+    GROWTH : dict
+    HP_PCT : float
+    MANA_COST : int
+    MANA_PCT : float
+    SPECIAL_NAME : str
+    STATS : dict
+    special_attack(target, rng)
+  }
+  class Knight {
+    BASE_HP : int
+    BASE_MANA : int
+    CRIT_MULT : float
+    GROWTH : dict
+    HP_PCT : float
+    MANA_COST : int
+    MANA_PCT : float
+    SPECIAL_NAME : str
+    STATS : dict
+    special_attack(target, rng)
+  }
+  class OgreWarlord {
+    ATK : int
+    BASE_HP : int
+    DEF : int
+    ESSENCE : int
+    PHASE_AT : float
+    PHASE_BONUS : float
+    PHASE_TEXT : str
+    SPECIAL_NAME : str
+    STATS : dict
+    turns_taken
+    choose_action()
+  }
+  class Orc {
+    ATK : int
+    BASE_HP : int
+    DEF : int
+    ESSENCE : int
+    STATS : dict
+    choose_action()
+    damage_bonus()
+  }
+  class Potion {
+    heal_amount : int
+    apply(hero)
+    describe()
+  }
+  class Sorcerer {
+    BASE_HP : int
+    BASE_MANA : int
+    CRIT_MULT : float
+    GROWTH : dict
+    HP_PCT : float
+    MANA_COST : int
+    MANA_PCT : float
+    SPECIAL_NAME : str
+    STATS : dict
+    special_attack(target, rng)
+  }
+  class Thief {
+    BASE_HP : int
+    BASE_MANA : int
+    CRIT_MULT : float
+    GROWTH : dict
+    HP_PCT : float
+    MANA_COST : int
+    MANA_PCT : float
+    SPECIAL_NAME : str
+    STATS : dict
+    special_attack(target, rng)
+  }
+  class Weapon {
+    attack
+    focus : int
+    slot : str
+    bonuses()
+    describe()
+  }
+  BossEnemy --|> Enemy
+  ElderDragon --|> BossEnemy
+  Enemy --|> Character
+  Goblin --|> Enemy
+  OgreWarlord --|> BossEnemy
+  Orc --|> Enemy
+  Druid --|> Hero
+  Hero --|> Character
+  Jester --|> Hero
+  Knight --|> Hero
+  Sorcerer --|> Hero
+  Thief --|> Hero
+  Accessory --|> Equipment
+  Armor --|> Equipment
+  Consumable --|> Item
+  Equipment --|> Item
+  Potion --|> Consumable
+  Weapon --|> Equipment
+  Battle --* Game : battle
+  Inventory --* Hero : inventory
