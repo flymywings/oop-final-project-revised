@@ -47,7 +47,7 @@ class Enemy(Character, ABC):
 
     def describe(self):
         """e.g. 'Goblin - 67 HP, 24 ATK'."""
-        raise NotImplementedError("Daniel")
+        return f"{self.name} - {self.max_hp} HP, {self.ATK} ATK"
 
 
 class BossEnemy(Enemy, ABC):
@@ -65,16 +65,22 @@ class BossEnemy(Enemy, ABC):
 
     def check_phase(self):
         """Move to phase 2 once, when HP < PHASE_AT * max_hp. Returns a log line or None."""
-        raise NotImplementedError("Daniel")
+        if self.phase == 1 and self.hp < self.max_hp * self.PHASE_AT:
+            self.phase = 2
+            return f"{self.name} {self.PHASE_TEXT}"
+        return None
 
     def damage_bonus(self):
         """PHASE_BONUS in phase 2, else 1.0."""
-        raise NotImplementedError("Daniel")
+        if self.phase == 2:
+            return self.PHASE_BONUS
+        return 1.0
 
     def special_attack(self, target, rng):
         """_roll_damage(SPECIAL_SCALE x attack_power, label=SPECIAL_NAME,
         ignore_armor=True). Returns a log line."""
-        raise NotImplementedError("Daniel")
+        return self._roll_damage(target, self.attack_power * self.SPECIAL_SCALE,
+                                 rng, self.SPECIAL_NAME, ignore_armor=True)
 
 
 class Goblin(Enemy):
@@ -89,7 +95,7 @@ class Goblin(Enemy):
 
     def choose_action(self):
         """Always 'attack'."""
-        raise NotImplementedError("Daniel")
+        return "attack"
 
 
 class Orc(Enemy):
@@ -104,11 +110,13 @@ class Orc(Enemy):
 
     def damage_bonus(self):
         """1.25 while hp < 50 % of max_hp, else 1.0."""
-        raise NotImplementedError("Daniel")
+        if self.hp < self.max_hp * 0.5:
+            return 1.25
+        return 1.0
 
     def choose_action(self):
         """Always 'attack'."""
-        raise NotImplementedError("Daniel")
+        return "attack"
 
 
 class OgreWarlord(BossEnemy):
@@ -125,7 +133,8 @@ class OgreWarlord(BossEnemy):
 
     def choose_action(self):
         """turns_taken += 1; 'special' when turns_taken % 3 == 0, else 'attack'."""
-        raise NotImplementedError("Daniel")
+        self.turns_taken += 1
+        return "special" if self.turns_taken % 3 == 0 else "attack"
 
 
 class ElderDragon(BossEnemy):
@@ -142,7 +151,8 @@ class ElderDragon(BossEnemy):
 
     def choose_action(self):
         """turns_taken += 1; 'special' when turns_taken % 3 == 0, else 'attack'."""
-        raise NotImplementedError("Daniel")
+        self.turns_taken += 1
+        return "special" if self.turns_taken % 3 == 0 else "attack"
 
 
 FLOORS = [Goblin, Orc, OgreWarlord, ElderDragon]   # floor 1..4
