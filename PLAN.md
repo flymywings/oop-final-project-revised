@@ -244,6 +244,20 @@ A throwaway bot (special when affordable, potion under 35 % HP, always takes the
 
 With those values, run win is Knight 18 %, Thief 30 %, Jester 64 %, Sorcerer 30 % and Druid 99 %. **Enemy-only levers cannot fix the class spread** (the Druid's sustain and the Sorcerer's lost Mana Potion). If the manual runs agree, the Lead decides whether to allow one class constant change, such as the Sorcerer's MANA_COST. The bot plays worse than a human, so treat these numbers as direction only.
 
+**Decision (Lead, 25 November 2026):** the suggested enemy values above are now in models/enemies.py.
+The one class change is **Shield Bash 0.8x → 1.2x attack** (models/heroes.py). At 0.8x the special hit softer than Light, and the Knight dealt the least damage of any class (12 per turn).
+Better starter armor barely helped: Chainmail gave 18 %, Plate Armor 20 %. Measured on the team's real code, 1,000 runs per class:
+
+| Class | Run win |
+|---|---|
+| Knight | 53 % |
+| Thief | 31 % |
+| Jester | 70 % |
+| Sorcerer | 30 % |
+| Druid | 66 % |
+
+Re-check by hand during 5:00-6:30.
+
 ---
 
 ## E. Task cards
@@ -276,7 +290,7 @@ parameters or constants. Do NOT add features. Rules:
 - No GUI imports. Never write the words "tkinter" or "pygame" anywhere in models/, not even in comments.
 - Spells (Trick, Fireball, Rejuvenate damage) and boss slam/breath use ignore_armor=True.
 - gain_essence levels up at most once per call; level_up calls self.grow(self.GROWTH).
-- Abilities: Knight 0.8x attack then BLOCK; Thief 1.5x attack force_crit; Jester 0.5x spell then
+- Abilities: Knight 1.2x attack then BLOCK; Thief 1.5x attack force_crit; Jester 0.5x spell then
   roll=rng.randint(1,6)+LUCK//5: <=4 CRIT UP self, 5-6 STUN target, 7-8 heal 20% max HP,
   >=9 extra 1.5x spell hit; Sorcerer 1.0x spell; Druid heal 25% max HP, REGEN 3 turns, 0.5x spell.
 - Bosses: choose_action increments turns_taken, 'special' every 3rd turn; check_phase switches

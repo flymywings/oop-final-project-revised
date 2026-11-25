@@ -62,7 +62,7 @@ Useful helpers already on every character: `self.heal(amount)` (returns how much
 4. `Hero.level_up()`: `self.level += 1`, `self.grow(self.GROWTH)`, return `"LEVEL UP! Knight is now Lv2."`
 5. `Hero.describe()`: return `"Knight Lv2 - Shield Bash (10 MP)"`
 6. The 5 specials:
-   - **Knight**: hit for `attack_power * 0.8`, then `self.add_status(BLOCK)`.
+   - **Knight**: hit for `attack_power * 1.2`, then `self.add_status(BLOCK)`.
    - **Thief**: hit for `attack_power * 1.5` with `force_crit=True`.
    - **Jester**: hit for `spell_power * 0.5` (ignore_armor). Then `roll = rng.randint(1, 6) + self.stat("LUCK") // 5`:
      - 4 or less: `self.add_status(CRIT_UP)`
@@ -132,7 +132,7 @@ parameters or constants. Do NOT add features. Rules:
 - No GUI imports. Never write the words "tkinter" or "pygame" anywhere in models/, not even in comments.
 - Spells (Trick, Fireball, Rejuvenate damage) and boss slam/breath use ignore_armor=True.
 - gain_essence levels up at most once per call; level_up calls self.grow(self.GROWTH).
-- Abilities: Knight 0.8x attack then BLOCK; Thief 1.5x attack force_crit; Jester 0.5x spell then
+- Abilities: Knight 1.2x attack then BLOCK; Thief 1.5x attack force_crit; Jester 0.5x spell then
   roll=rng.randint(1,6)+LUCK//5: <=4 CRIT UP self, 5-6 STUN target, 7-8 heal 20% max HP,
   >=9 extra 1.5x spell hit; Sorcerer 1.0x spell; Druid heal 25% max HP, REGEN 3 turns, 0.5x spell.
 - Bosses: choose_action increments turns_taken, 'special' every 3rd turn; check_phase switches

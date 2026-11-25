@@ -73,7 +73,7 @@ class Hero(Character, ABC):
 
 
 class Knight(Hero):
-    """Tank. Shield Bash: 0.8x attack, then BLOCK halves the next hit taken."""
+    """Tank. Shield Bash: 1.2x attack, then BLOCK halves the next hit taken."""
 
     BASE_HP, HP_PCT, BASE_MANA, MANA_PCT = 100, 1.20, 20, 1.00
     CRIT_MULT = 1.5
@@ -86,8 +86,8 @@ class Knight(Hero):
         super().__init__("Knight")
 
     def special_attack(self, target, rng):
-        """_roll_damage(0.8x attack_power), then add_status(BLOCK). Returns a log line."""
-        line = self._roll_damage(target, self.attack_power * 0.8, rng, "Shield Bash")
+        """_roll_damage(1.2x attack_power), then add_status(BLOCK). Returns a log line."""
+        line = self._roll_damage(target, self.attack_power * 1.2, rng, "Shield Bash")
         self.add_status(BLOCK)
         return f"{line} {self.name} braces for the next hit (BLOCK)."
 

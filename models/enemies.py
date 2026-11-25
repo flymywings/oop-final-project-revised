@@ -2,7 +2,8 @@
 
 Owner: Daniel. CONTRACT SKELETON: keep every name and signature;
 replace each `raise NotImplementedError` with the real body.
-Stats are docx Table 25, Variant B. Essence drops are from the brief.
+Stats are docx Table 25, Variant B; Orc, Ogre Warlord and Elder Dragon
+were rebalanced for the 4-floor game (PLAN.md section D). Essence drops are from the brief.
 Balancing rule: if a fight is impossible or trivial, change BASE_HP or ATK only.
 """
 
@@ -101,7 +102,7 @@ class Goblin(Enemy):
 class Orc(Enemy):
     """Floor 2. +25 % damage while below 50 % HP."""
 
-    BASE_HP, ATK, DEF, ESSENCE = 170, 30, 2, 30
+    BASE_HP, ATK, DEF, ESSENCE = 110, 22, 2, 30
     STATS = {"DEX": 5, "LUCK": 0}
 
     def __init__(self):
@@ -122,7 +123,7 @@ class Orc(Enemy):
 class OgreWarlord(BossEnemy):
     """Floor 3 boss. Slam every 3rd turn; ENRAGED (+50 %) below 30 % HP."""
 
-    BASE_HP, ATK, DEF, ESSENCE = 200, 23, 3, 35
+    BASE_HP, ATK, DEF, ESSENCE = 170, 19, 3, 35
     STATS = {"DEX": 6, "LUCK": 0}
     PHASE_AT, PHASE_BONUS, PHASE_TEXT = 0.30, 1.50, "is ENRAGED!"
     SPECIAL_NAME = "Slam"
@@ -140,7 +141,7 @@ class OgreWarlord(BossEnemy):
 class ElderDragon(BossEnemy):
     """Floor 4 boss. Breath every 3rd turn; PHASE 2 (+25 %) below 50 % HP."""
 
-    BASE_HP, ATK, DEF, ESSENCE = 345, 23, 2, 80
+    BASE_HP, ATK, DEF, ESSENCE = 260, 18, 2, 80
     STATS = {"DEX": 7, "LUCK": 0}
     PHASE_AT, PHASE_BONUS, PHASE_TEXT = 0.50, 1.25, "enters PHASE 2!"
     SPECIAL_NAME = "Fire Breath"
