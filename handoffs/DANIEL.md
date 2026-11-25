@@ -2,6 +2,7 @@
 
 ## The game in 10 seconds
 You pick a hero (Knight, Thief, Jester, Sorcerer or Druid). You fight 4 monsters in a row, one at a time, by clicking buttons. Beat all 4 and you win.
+The menu is a Tkinter window and the fights are a Pygame window, but your files never see either one. They are plain Python that both windows read through the game object.
 
 ## Your job in one sentence
 Make the 5 heroes and 4 monsters actually *do* their moves.
@@ -23,7 +24,7 @@ Everything else belongs to someone else. If you think another file is wrong, tel
    - **With git:** Run `git clone https://github.com/flymywings/oop-final-project-revised.git`, then `cd` into the folder. Accept the Lead's GitHub invitation before pushing.
    - **Without git:** ask the Lead for the zip, unzip it, and open a terminal in that folder.
 2. Check Python: `python --version` must say 3.12.
-3. Install the test tool: `pip install pytest`
+3. Install the test tool: `python -m pip install pytest`. You only need Pygame (`python -m pip install pygame`) if you also want to click through the game with `python main.py stub`. Your tests don't need it.
 4. Run the tests: `python -m pytest -q`. Lots of red is normal. Red means "not built yet".
 
 ## Step 1: Understand the 3 ideas you need (5 min)
@@ -84,14 +85,16 @@ Useful helpers already on every character: `self.heal(amount)` (returns how much
 - Don't rename anything or change any `def` line. Other people's code calls these exact names.
 - Use `int()`, never `round()`.
 - Only `@property` and `@abstractmethod` decorators. No dataclasses.
-- Never write the word `tkinter` anywhere in `models/`. A test checks for it.
+- **No GUI in `models/`.** Never import a GUI toolkit, and never write the words `tkinter` or `pygame` anywhere in `models/`, not even in a comment. A test checks for both words. Screens read your objects; your objects never draw.
 - No new features (no gold, no shop, no extra moves).
 
 ## How you know you're done
 ```
 python -m pytest -q tests/test_models.py
+grep -rE "tkinter|pygame" models/
 ```
 Every hero and enemy test is green. Item tests may stay red until TJ pushes (around 2:30). That's fine.
+The `grep` line must print **nothing**. No `grep` on Windows? Run `python -m pytest -q tests/test_no_gui_in_models.py` instead; it must pass. (TJ extends that test to check both words; until then the grep is the check for `pygame`.)
 
 ## Push your work
 ```
@@ -126,7 +129,7 @@ parameters or constants. Do NOT add features. Rules:
   ignore_armor=..., force_crit=...). Never subtract HP by hand except through heal().
 - special_attack(self, target, rng) returns ONE log string. Mana is already paid by use_special().
 - Use int(), never round(). No decorators except @property and @abstractmethod. No dataclasses.
-- No GUI imports and never write the word "tkinter" in models/.
+- No GUI imports. Never write the words "tkinter" or "pygame" anywhere in models/, not even in comments.
 - Spells (Trick, Fireball, Rejuvenate damage) and boss slam/breath use ignore_armor=True.
 - gain_essence levels up at most once per call; level_up calls self.grow(self.GROWTH).
 - Abilities: Knight 0.8x attack then BLOCK; Thief 1.5x attack force_crit; Jester 0.5x spell then

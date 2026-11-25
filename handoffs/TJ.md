@@ -2,6 +2,7 @@
 
 ## The game in 10 seconds
 You pick a hero and fight 4 monsters in a row by clicking buttons. After each win you pick 1 of 3 items (a sword, armor, a potion...). Beat all 4 and you win.
+The menu is a Tkinter window and the fights and rewards are a Pygame window, but your files never see either one. Items and tests are plain Python.
 
 ## Your job in one sentence
 Make the items, the hero's bag (inventory) and the "pick 1 of 3" rewards work, then keep the tests green.
@@ -11,7 +12,7 @@ Make the items, the hero's bag (inventory) and the "pick 1 of 3" rewards work, t
 - everything in `tests/` (already written; you own them and keep them running)
 
 ## Deadlines
-- **2:30**: push `Inventory`, `make_item` and `starter_kit`. Daniel's tests need them, so this goes first.
+- **2:30**: push `Inventory`, `make_item` and `starter_kit`. Daniel's tests need them, so this goes first. Push the two-toolkit GUI test (Step 3) with it.
 - **5:00**: the full test suite is green (`python -m pytest -q`).
 
 ---
@@ -21,7 +22,7 @@ Make the items, the hero's bag (inventory) and the "pick 1 of 3" rewards work, t
    - **With git:** Run `git clone https://github.com/flymywings/oop-final-project-revised.git`, then `cd` into the folder. Accept the Lead's GitHub invitation before pushing.
    - **Without git:** ask the Lead for the zip, unzip it, and open a terminal in that folder.
 2. `python --version` must say 3.12.
-3. `pip install pytest`
+3. `python -m pip install pytest`. You only need Pygame (`python -m pip install pygame`) to click through the game with `python main.py stub`. The tests never import it.
 4. `python -m pytest -q`. Lots of red is normal. Red means "not built yet".
 
 ## Step 1: Understand the 3 ideas you need (5 min)
@@ -56,17 +57,38 @@ Armor returns `{"defense": ..., "focus": ...}`. An accessory returns `{self.stat
 6. **Push now** (2:30 goal).
 7. `reward_choices(owned_names, rng, count=3)`: list every catalogue name the hero doesn't own ("Health Potion" is always allowed). Pick 3 different ones with `rng.sample(pool, count)` and return new items. Use the `rng` you are given; never `import random`.
 
+## Step 3: the GUI separation test checks both toolkits (5 min, by 2:30)
+The game now has two GUI toolkits, Tkinter and Pygame, and neither may appear in `models/` or `logic/`.
+`tests/test_no_gui_in_models.py` looks only for `tkinter` today. Change it to look for both words.
+Keep the split-string trick, so the test file doesn't match its own grep:
+```python
+TOOLKITS = ("tk" + "inter", "py" + "game")   # split so this file does not match its own grep
+
+
+def test_no_gui_import_in_models_or_logic():
+    offenders = [str(path.relative_to(ROOT))
+                 for folder in ("models", "logic")
+                 for path in (ROOT / folder).rglob("*.py")
+                 if any(name in path.read_text(encoding="utf-8") for name in TOOLKITS)]
+    assert offenders == []
+```
+Also update the file's first line (its docstring) to say "the GUI toolkits (Tkinter, Pygame)". Do not write either word as one piece anywhere in the file.
+Check it: `python -m pytest -q tests/test_no_gui_in_models.py` must pass. Then put the word `pygame` in a comment in `models/items.py`: the test must FAIL. Remove the word again.
+
 ## Rules (please don't break these)
 - Don't rename anything or change any `def` line, any CATALOGUE row or STARTER_KITS.
 - No prices, no shop, no gold. They are cut.
 - Only `@property` and `@abstractmethod` decorators.
-- Never write the word `tkinter` in `models/`. A test checks for it.
+- **No GUI in `models/`.** Never import a GUI toolkit, and never write the words `tkinter` or `pygame` anywhere in `models/`, not even in a comment. The test checks for both.
 
 ## How you know you're done
 ```
 python -m pytest -q tests/test_models.py
+python -m pytest -q tests/test_no_gui_in_models.py
+grep -rE "tkinter|pygame" models/ logic/
 ```
-The equip, inventory, reward and potion tests are green. At 5:00, run `python -m pytest -q` and **everything** must be green. If a test goes red that isn't yours, tell that file's owner with the error text.
+The equip, inventory, reward and potion tests are green, the GUI test passes, and the `grep` line prints **nothing** (no `grep` on Windows? the GUI test is the same check).
+At 5:00, run `python -m pytest -q` and **everything** must be green. If a test goes red that isn't yours, tell that file's owner with the error text.
 
 ## Push your work
 ```
@@ -79,7 +101,7 @@ git push
 ### No git? Send your code to the Lead instead
 That's fine. The Lead checks it and puts it in the project for you.
 1. Run the "How you know you're done" check first, and write in your message whether it passed (copy the last line it printed).
-2. Send **only your files**: `models/items.py` (plus any file in `tests/` you changed).
+2. Send **only your files**: `models/items.py` and `tests/test_no_gui_in_models.py` (plus any other file in `tests/` you changed).
 3. Send the **whole file** as an attachment (or the zip of those files), not a pasted piece of it. Keep the exact file names.
 4. Each time you send a newer version, send the whole file again, so there's never a question about which copy is the latest.
 5. Send `models/items.py` by **2:30** even if `reward_choices` isn't done yet, because Daniel needs it. Send the rest when it's done.
@@ -104,6 +126,7 @@ parameters, CATALOGUE rows or STARTER_KITS. Do NOT add prices, shops or features
 - reward_choices(owned_names, rng, count=3): distinct names, none owned except "Health Potion"
   (always allowed), picked with rng.sample, returned as NEW items.
 - Potion.apply(hero) uses hero.heal(amount) and returns one log string.
-- No decorators except @property and @abstractmethod. No GUI imports; never write "tkinter" here.
+- No decorators except @property and @abstractmethod. No GUI imports; never write "tkinter" or
+  "pygame" in this file, not even in comments.
 Then run python -m pytest -q tests/test_models.py and show me the output.
 ```
