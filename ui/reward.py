@@ -9,7 +9,9 @@ Never call pygame.init(), set_mode(), flip() or pygame.quit(): main.py does.
 Mouse only: no key events.
 """
 
-from ui import theme
+import pygame
+
+from ui import sound, theme
 
 CARD_W, CARD_H, CARD_GAP = 320, 300, 30
 CARD_Y = 210
@@ -48,6 +50,8 @@ class RewardScreen:
         self.cards = [(item, theme.PgButton((left + i * (CARD_W + CARD_GAP), CARD_Y, CARD_W, CARD_H),
                                             "", self.font))
                       for i, item in enumerate(offers)]
+        self.hover = sound.HoverTracker()
+        sound.play("floor_clear")
         self.texts = [((item.slot or "item").upper(),
                        wrap(item.describe(), self.font, CARD_W - 40),
                        wrap(app.game.reward_delta(item), self.font, CARD_W - 40))
@@ -57,6 +61,7 @@ class RewardScreen:
         """A click on a card claims that item."""
         for item, card in self.cards:
             if card.hit(pos):
+                sound.play("click")
                 self.pick(item)
                 return
 
@@ -66,7 +71,8 @@ class RewardScreen:
         self.app.show()
 
     def update(self, now_ms):
-        """Nothing moves on this screen."""
+        """Nothing moves; only the hover sound is tracked."""
+        self.hover.update({i: card.rect for i, (_, card) in enumerate(self.cards)}, pygame.mouse.get_pos())
 
     def draw(self, surface):
         """Title, then each card with its slot, name, description and stat change."""

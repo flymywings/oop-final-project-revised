@@ -10,7 +10,7 @@ Mouse only: no key bindings.
 
 import tkinter as tk
 
-from ui import theme
+from ui import sound, theme
 
 ATTRIBUTE_COUNT = 6          # the first 6 stats (STR..LUCK) go on row 1, the rest on row 2
 MAX_SPRITE = 160             # widest a class sprite may be on its button, in pixels
@@ -48,6 +48,7 @@ class MenuScreen(tk.Frame):
                                        highlightthickness=3, highlightbackground=theme.BG,
                                        **options)
             button.pack(side="left", padx=8)
+            sound.bind_tk(button)
             self.buttons[name] = button
         # Fixed-size panel, so the layout does not jump when a class is picked.
         self.panel = tk.Frame(self, bg=theme.PANEL, width=780, height=190)
@@ -63,9 +64,40 @@ class MenuScreen(tk.Frame):
                                               pady=6, command=self.start, state="disabled",
                                               disabledforeground=DIM, highlightthickness=0)
         self.start_button.pack(pady=(6, 6))
+        sound.bind_tk(self.start_button)
         self.hint = tk.Label(self, text="Pick a hero to enable Start", font=theme.FONT_SMALL,
                              bg=theme.BG, fg=DIM)
         self.hint.pack()
+        self._build_sound_controls()
+        sound.ensure()
+
+    def _build_sound_controls(self):
+        """Mouse-only volume down, volume up and mute, top right."""
+        bar = tk.Frame(self, bg=theme.BG)
+        bar.place(relx=1.0, x=-16, y=12, anchor="ne")
+        self.mute_button = theme.HoverButton(bar, text="", font=theme.FONT_SMALL, width=11,
+                                             command=self.toggle_mute)
+        for text, delta in (("-", -sound.VOLUME_STEP), ("+", sound.VOLUME_STEP)):
+            theme.HoverButton(bar, text=text, font=theme.FONT_SMALL, width=3,
+                              command=lambda d=delta: self.change_volume(d)).pack(side="left", padx=2)
+        self.mute_button.pack(side="left", padx=2)
+        self.refresh_sound_label()
+
+    def refresh_sound_label(self):
+        """Show Muted or the volume on the mute button."""
+        self.mute_button.configure(text="Muted" if sound.is_muted() else f"Sound {round(sound.volume() * 100)}%")
+
+    def toggle_mute(self):
+        """Mute or unmute, then refresh the label."""
+        sound.toggle_mute()
+        self.refresh_sound_label()
+        sound.play("click")
+
+    def change_volume(self, delta):
+        """Move the volume one step, then refresh the label."""
+        sound.change_volume(delta)
+        self.refresh_sound_label()
+        sound.play("click")
 
     def pick(self, class_name):
         """Select (do not start): highlight the button and show the class stats."""

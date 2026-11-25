@@ -11,7 +11,7 @@ Mouse only: no key events.
 
 import pygame
 
-from ui import theme
+from ui import sound, theme
 
 BIG_FONT = ("Arial", 54, "bold")     # the Victory / Defeat headline
 DIM = "#8a8a99"
@@ -32,10 +32,13 @@ class EndScreen:
         self.sprite = theme.load_surface(game.hero.sprite_name)   # None until the PNGs exist
         self.panel = pygame.Rect(270, 270, 560, 240)
         self.restart_button = theme.PgButton((425, 560, 250, 64), "Restart", self.head)
+        self.hover = sound.HoverTracker()
+        sound.play("victory" if self.won else "defeat")
 
     def handle_click(self, pos):
         """Restart is the only clickable."""
         if self.restart_button.hit(pos):
+            sound.play("click")
             self.restart()
 
     def restart(self):
@@ -44,7 +47,8 @@ class EndScreen:
         self.app.show()
 
     def update(self, now_ms):
-        """Nothing moves on this screen."""
+        """Nothing moves; only the hover sound is tracked."""
+        self.hover.update({"restart": self.restart_button.rect}, pygame.mouse.get_pos())
 
     def draw(self, surface):
         """The result, a hero panel (sprite, floor reached, hero line) and Restart."""

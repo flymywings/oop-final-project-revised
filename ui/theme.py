@@ -1,8 +1,7 @@
 """Shared look for both toolkits: colours, fonts, buttons, sprite loaders.
 
-Owner: Khael. CONTRACT STUB: the names below are fixed and already work
-in a plain way so Joseph can build on them. Khael restyles freely but
-keeps every name and signature. Push the final version by 2:00.
+Owner: Khael. The names below are fixed (other screens import them); the
+look is restyled freely.
 
 Tkinter half (the menu):  FONT_*, HoverButton, bind_hover, load_sprite.
 Pygame half (battle, reward, end): pg_font, PgButton, load_surface.
@@ -17,19 +16,25 @@ import tkinter as tk
 import pygame
 
 # Colours
-BG = "#1e1e2a"
-PANEL = "#2b2b3c"
-FG = "#f0f0f0"
-ACCENT = "#e3b44c"
-BUTTON = "#3e5b7c"
-HOVER = "#6e93bc"
-DISABLED = "#555555"
-HP_COLOR = "#c93b32"
-MP_COLOR = "#4f7fdc"
-CHIP = "#3e9c8c"
+BG = "#161824"
+PANEL = "#242738"
+FG = "#f2efe6"
+ACCENT = "#f0b84a"
+BUTTON = "#34507a"
+HOVER = "#5f8ccc"
+DISABLED = "#44464f"
+HP_COLOR = "#d6453b"
+MP_COLOR = "#4a86e8"
+CHIP = "#2f9e8a"
+
+# Extra colours (new names, used by the Pygame screens)
+PANEL_EDGE = "#3d4260"
+BAR_BG = "#0f101a"
+FG_DIM = "#8b8d99"
+LOG_BG = "#10111b"
 
 # Fonts (Tk tuples; pg_font turns them into Pygame fonts)
-FONT_TITLE = ("Arial", 28, "bold")
+FONT_TITLE = ("Georgia", 28, "bold")
 FONT_HEAD = ("Arial", 16, "bold")
 FONT_BODY = ("Arial", 12)
 FONT_SMALL = ("Arial", 10)
@@ -48,6 +53,7 @@ class HoverButton(tk.Button):
         kw.setdefault("bg", BUTTON)
         kw.setdefault("fg", FG)
         kw.setdefault("activebackground", HOVER)
+        kw.setdefault("activeforeground", FG)
         kw.setdefault("font", FONT_BODY)
         kw.setdefault("relief", "flat")
         kw.setdefault("cursor", "hand2")
@@ -110,13 +116,14 @@ class PgButton:
     def draw(self, surface):
         """DISABLED when not enabled, HOVER while the mouse is over it, else BUTTON."""
         if not self.enabled:
-            colour = DISABLED
+            colour, text_colour = DISABLED, FG_DIM
         elif self.rect.collidepoint(pygame.mouse.get_pos()):
-            colour = HOVER
+            colour, text_colour = HOVER, FG
         else:
-            colour = BUTTON
-        pygame.draw.rect(surface, colour, self.rect, border_radius=6)
-        label = self.font.render(self.text, True, FG)
+            colour, text_colour = BUTTON, FG
+        pygame.draw.rect(surface, colour, self.rect, border_radius=8)
+        pygame.draw.rect(surface, PANEL_EDGE, self.rect, width=2, border_radius=8)
+        label = self.font.render(self.text, True, text_colour)
         surface.blit(label, label.get_rect(center=self.rect.center))
 
 
@@ -125,4 +132,7 @@ def load_surface(name):
     path = os.path.join(ASSETS, name + ".png")
     if not os.path.exists(path):
         return None
-    return pygame.image.load(path)
+    image = pygame.image.load(path)
+    if pygame.display.get_surface() is not None:   # convert only once a window exists
+        image = image.convert_alpha()
+    return image

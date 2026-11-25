@@ -13,7 +13,7 @@ You need Python 3.12 (`python --version`).
 ```
 git clone https://github.com/flymywings/oop-final-project-revised.git
 cd oop-final-project-revised
-python -m pip install pygame pytest
+python -m pip install -r requirements.txt
 python main.py
 ```
 
@@ -104,7 +104,13 @@ Only one window is open at a time, and both use the same `Game` object. `main.py
 
 ## Credits
 
-The team: Daniel, TJ, Khael, Joseph and the Lead. Sprites are drawn by Khael.
+The team: Daniel, TJ, Khael, Joseph and the Lead. The five hero sprites and the battle background are by Khael.
+
+Enemy sprites, from OpenGameArt.org:
+- Goblin, Orc and Ogre Warlord: "Orc, Ogre and Goblin Chibi Sprites" by CraftPix.net, OGA-BY 3.0 (https://opengameart.org/content/orc-ogre-and-goblin-chibi-sprites). Idle frame 0, scaled to 200x200.
+- Elder Dragon: "Dragon Sprites" by Chibizilla, CC-BY 4.0 (https://opengameart.org/content/dragon-sprites). Scaled to 200x200.
+
+Sound effects are Undertale sounds by Toby Fox. They are copyrighted and **not free-use**: they are used here only for a class project and must not be redistributed. Where each file came from is in `sounds/SOURCES.md`. If `sounds/` has no files, or the PC has no audio device, the game runs silently. Mute and volume are mouse buttons at the top of the menu and the battle screen. To rebuild the files from raw sounds, run `python tools/process_sounds.py` (needs ffmpeg).
 
 ## How to contribute
 
