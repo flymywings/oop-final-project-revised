@@ -8,7 +8,7 @@ import random
 
 from logic.battle import Battle
 from models.heroes import HERO_CLASSES
-from models.items import reward_choices, starter_kit
+from models.items import CATALOGUE, make_item, starter_kit
 
 LAST_FLOOR = 4
 # state values the UI routes on
@@ -81,10 +81,29 @@ class Game:
             if self.floor >= LAST_FLOOR:
                 self.state = VICTORY
             else:
-                self.offers = reward_choices(self.hero.inventory.owned_names(), self.rng)
+                self.offers = self._make_offers()
                 self.state = REWARD
         elif self.battle.winner == "enemy":
             self.state = DEFEAT
+
+    def _make_offers(self):
+        """3 distinct reward items, none owned, and every piece of gear an upgrade.
+
+        The game has no bag screen, so an item the hero would not wear is a dead card.
+        The Health Potion is always allowed. If fewer than 3 upgrades exist, the
+        offer is shorter rather than padded with useless gear.
+        """
+        owned = self.hero.inventory.owned_names()
+        pool = [make_item(name) for name in CATALOGUE if name == "Health Potion" or name not in owned]
+        pool = [item for item in pool if self._is_upgrade(item)]
+        return self.rng.sample(pool, min(3, len(pool)))
+
+    def _is_upgrade(self, item):
+        """True for consumables, for gear that fills an empty slot, and for gear that
+        raises ATK + SPELL + DEF over what the hero wears now."""
+        if item.slot is None or self.hero.inventory.equipped(item.slot) is None:
+            return True
+        return self._equip_effect(item)[0]
 
     def _equip_effect(self, item):
         """(is_upgrade, change text) if item replaced the one in its slot.
@@ -104,21 +123,17 @@ class Game:
         return score(after) > score(before), ", ".join(changes) or "no stat change"
 
     def reward_delta(self, item):
-        """Stat change text if item were claimed, e.g. 'ATK 16 -> 23'.
-        A gear item that would not be an upgrade says 'Bag only', because claiming
-        it keeps the item in the bag instead of wearing it."""
+        """Stat change text if item were claimed, e.g. 'ATK 16 -> 23'."""
         if item.slot is None:
             return f"+1 {item.name} (have {self.hero.inventory.count(item.name)})"
-        better, text = self._equip_effect(item)
-        return text if better else f"Bag only (not an upgrade): {text}"
+        return self._equip_effect(item)[1]
 
     def claim_reward(self, item):
-        """Add item to the bag, equip it if it is an upgrade, full heal, next floor battle."""
+        """Add item to the bag, equip it if it has a slot, full heal, next floor battle."""
         if self.state != REWARD or item not in self.offers:
             raise ValueError("that item is not on offer")
-        better = item.slot is not None and self._equip_effect(item)[0]
         self.hero.inventory.add(item)
-        if better:                    # wear it only if it is an upgrade; otherwise keep it in the bag
+        if item.slot is not None:     # offers are always upgrades, so gear is always worn
             self.hero.equip(item)
         self.hero.full_heal()
         self.floor += 1

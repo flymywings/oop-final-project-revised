@@ -74,29 +74,31 @@ def test_light_button_and_portrait_share_one_call():
     assert game.battle.turn == "player" and len(game.battle.log) == log_len + 1
 
 
-def test_reward_that_is_not_an_upgrade_stays_in_the_bag():
-    """Claiming a worse armor must not replace the better one the hero wears."""
-    from models.items import make_item
-    game = Game(seed=7)
-    game.new_run("Druid")                          # wears Hide Armor (defense 3)
-    game.battle.enemy.hp = 1
-    game.player_action("light")
-    worse = make_item("Cloth Robe")                # defense 1
-    game.offers = [worse]
-    assert game.reward_delta(worse).startswith("Bag only")
-    game.claim_reward(worse)
-    assert game.hero.inventory.equipped("armor").name == "Hide Armor"
-    assert game.hero.inventory.count("Cloth Robe") == 1
+
+def test_offers_are_only_upgrades_and_claiming_wears_them():
+    """No dead cards: every offered piece of gear beats what the hero wears."""
+    for seed in range(30):
+        game = Game(seed=seed)
+        game.new_run("Druid")
+        game.battle.enemy.hp = 1
+        game.player_action("light")
+        assert game.state == "reward"
+        for item in game.offers:
+            if item.slot is not None:
+                assert game._is_upgrade(item)
+        gear = [item for item in game.offers if item.slot is not None]
+        if gear:
+            game.claim_reward(gear[0])
+            assert game.hero.inventory.equipped(gear[0].slot) is gear[0]
 
 
-def test_reward_that_is_an_upgrade_is_worn():
+def test_worse_gear_is_never_offered():
+    """A hero wearing the best armor is not offered Cloth Robe."""
     from models.items import make_item
     game = Game(seed=7)
-    game.new_run("Knight")                         # wears Leather Vest (defense 2)
-    game.battle.enemy.hp = 1
-    game.player_action("light")
-    better = make_item("Plate Armor")              # defense 8
-    game.offers = [better]
-    assert game.reward_delta(better) == "DEF 2 -> 8"
-    game.claim_reward(better)
-    assert game.hero.inventory.equipped("armor").name == "Plate Armor"
+    game.new_run("Knight")
+    best = make_item("Dragon Scale")
+    game.hero.inventory.add(best)
+    game.hero.equip(best)
+    assert not game._is_upgrade(make_item("Cloth Robe"))
+    assert game._is_upgrade(make_item("Lucky Coin"))        # fills the empty accessory slot

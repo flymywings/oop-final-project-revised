@@ -197,6 +197,8 @@ CATALOGUE = {
     "Gnarled Club": ("weapon", 10, 5),
     "Oak Staff": ("weapon", 3, 14),
     "Warhammer": ("weapon", 15, 0),
+    "Dragon Fang": ("weapon", 20, 0),
+    "Archmage Staff": ("weapon", 6, 24),
     # armors: (defense, focus)
     "Cloth Robe": ("armor", 1, 0),
     "Leather Vest": ("armor", 2, 0),
@@ -204,6 +206,8 @@ CATALOGUE = {
     "Chainmail": ("armor", 5, 0),
     "Mage Robe": ("armor", 2, 8),
     "Plate Armor": ("armor", 8, 0),
+    "Dragon Scale": ("armor", 11, 0),
+    "Archmage Robe": ("armor", 4, 14),
     # accessories: (stat, amount)
     "Lucky Coin": ("accessory", "LUCK", 8),
     "Bracer of Might": ("accessory", "STR", 3),
